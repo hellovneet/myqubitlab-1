@@ -1,0 +1,146 @@
+import { CurriculumModule } from '../types/quantum';
+
+export const INITIAL_CURRICULUM_HI: CurriculumModule[] = [
+  {
+    id: 'mod-foundations',
+    title: '1. क्वांटम सूचना की बुनियादी बातें',
+    submodules: [
+      {
+        id: 'sub-classical-vs-quantum',
+        title: 'क्लासिकल बनाम क्वांटम कंप्यूटिंग',
+        difficulty: 'beginner',
+        durationMinutes: 15,
+        content: 'क्लासिकल बिट्स (0 या 1) और क्वांटम क्यूबिट्स (सुपरपोजिशन और सम्मिश्र आयाम) की तुलना करें। समझें कि क्वांटम कंप्यूटर केवल तेज कंप्यूटर नहीं हैं, बल्कि यह गणना का एक पूर्णतः भिन्न भौतिक मॉडल है।',
+        completed: false,
+      },
+      {
+        id: 'sub-qubits-bloch',
+        title: 'क्यूबिट्स और 3D ब्लॉक स्फ़ीयर',
+        difficulty: 'beginner',
+        durationMinutes: 20,
+        content: 'दो-स्तरीय क्वांटम प्रणाली का अन्वेषण करें। शुद्ध अवस्थाओं |ψ⟩ = α|0⟩ + β|1⟩ को ब्लॉक स्फ़ीयर पर इकाई सदिश (Unit Vector) के रूप में विज़ुअलाइज़ करें।',
+        completed: false,
+      },
+      {
+        id: 'sub-dirac-notation',
+        title: 'डिराक ब्रा-केट (Bra-Ket) नोटेशन',
+        difficulty: 'beginner',
+        durationMinutes: 25,
+        content: 'क्वांटम यांत्रिकी की सार्वभौमिक भाषा में महारत हासिल करें: कॉलम वेक्टर के रूप में केट |ψ⟩, पंक्ति संयुग्मी के रूप में ब्रा ⟨ψ|, इनर प्रोडक्ट और आउटर प्रोडक्ट।',
+        completed: false,
+      },
+    ],
+  },
+  {
+    id: 'mod-concepts',
+    title: '2. मुख्य क्वांटम परिघटनाएं',
+    submodules: [
+      {
+        id: 'sub-superposition',
+        title: 'क्वांटम सुपरपोजिशन और फेज',
+        difficulty: 'beginner',
+        durationMinutes: 20,
+        content: 'समझें कि कैसे हाडामर्ड गेट आधार अवस्थाओं का समान सुपरपोजिशन बनाता है और कैसे सापेक्ष फेज (Relative Phase) रचनात्मक व विनाशकारी व्यतिकरण को नियंत्रित करता है।',
+        completed: false,
+      },
+      {
+        id: 'sub-measurement',
+        title: 'क्वांटम मापन और वेवफंक्शन पतन',
+        difficulty: 'intermediate',
+        durationMinutes: 25,
+        content: 'बॉर्न का नियम: मापन संभाव्यता |c|² से प्राप्त होती है। प्रेक्षण के बाद क्वांटम अवस्था तत्काल मापी गई आइगेनस्टेट में सिमट (Collapse) जाती है।',
+        completed: false,
+      },
+      {
+        id: 'sub-entanglement',
+        title: 'क्वांटम उलझाव (Entanglement) और बेल स्टेट्स',
+        difficulty: 'intermediate',
+        durationMinutes: 30,
+        content: 'अ-वियोज्य (Non-separable) मल्टी-क्यूबिट अवस्थाओं का निर्माण करें। बेल स्टेट्स |Φ⁺⟩, |Φ⁻⟩, |Ψ⁺⟩, |Ψ⁻⟩ बनाएं और गैर-स्थानीय सहसंबंधों का अध्ययन करें।',
+        completed: false,
+      },
+      {
+        id: 'sub-teleportation',
+        title: 'क्वांटम टेलीपोर्टेशन प्रोटोकॉल',
+        difficulty: 'advanced',
+        durationMinutes: 35,
+        content: 'उलझे हुए युग्म और 2 क्लासिकल बिट्स का उपयोग करके किसी अज्ञात क्वांटम अवस्था को भौतिक रूप से स्थानांतरित किए बिना संप्रेषित करने का चरणबद्ध अध्ययन।',
+        completed: false,
+      },
+    ],
+  },
+  {
+    id: 'mod-gates',
+    title: '3. क्वांटम गेट्स और सर्किट कंपोज़र',
+    submodules: [
+      {
+        id: 'sub-single-gates',
+        title: 'सिंगल-क्यूबिट यूनिटरी गेट्स (X, Y, Z, H, S, T)',
+        difficulty: 'beginner',
+        durationMinutes: 20,
+        content: 'पाउली गेट्स, हाडामर्ड, और फेज गेट्स ब्लॉक स्फ़ीयर पर घूर्णन (Rotations) के रूप में कार्य करते हैं। इनका मैट्रिक्स निरूपण समझें।',
+        completed: false,
+      },
+      {
+        id: 'sub-multi-gates',
+        title: 'कंट्रोल्ड व मल्टी-क्यूबिट गेट्स (CNOT, CZ, SWAP, Toffoli)',
+        difficulty: 'intermediate',
+        durationMinutes: 25,
+        content: 'CNOT और अन्य नियंत्रित गेट्स क्वांटम परिपथों में एंटैंगलमेंट और लॉजिक ऑपरेशंस के निर्माण खंड हैं।',
+        completed: false,
+      },
+    ],
+  },
+  {
+    id: 'mod-math',
+    title: '4. क्वांटम गणित और लीनियर अल्जेब्रा',
+    submodules: [
+      {
+        id: 'sub-complex-numbers',
+        title: 'सम्मिश्र संख्याएं और यूलर का सूत्र',
+        difficulty: 'intermediate',
+        durationMinutes: 25,
+        content: 'सम्मिश्र आयाम a + bi = r·e^(iθ), आर्गैंड प्लेन और परिमाण-फेज संबंधों का गहन अभ्यास।',
+        completed: false,
+      },
+      {
+        id: 'sub-matrices-tensors',
+        title: 'मैट्रिक्स संक्रियाएं और टेंसर प्रोडक्ट्स',
+        difficulty: 'intermediate',
+        durationMinutes: 35,
+        content: 'मल्टी-क्यूबिट अवस्थाओं के लिए क्रोनेकर / टेंसर प्रोडक्ट ⊗ और यूनिटरी रूपांतरण U†U = I का गणितीय आधार।',
+        completed: false,
+      },
+    ],
+  },
+  {
+    id: 'mod-algorithms',
+    title: '5. क्वांटम एल्गोरिदम और कंप्यूटेशनल लाभ',
+    submodules: [
+      {
+        id: 'sub-deutsch',
+        title: 'डॉयच-जोज़ा सिंगल-क्वेरी ओरैकल',
+        difficulty: 'intermediate',
+        durationMinutes: 30,
+        content: 'डॉयच-जोज़ा एल्गोरिदम केवल एक क्वांटम क्वेरी से यह निर्धारित कर सकता है कि कोई फलन स्थिरांक (Constant) है या संतुलित (Balanced)।',
+        completed: false,
+      },
+      {
+        id: 'sub-grover',
+        title: 'ग्रोवर का असंरचित डेटाबेस खोज एल्गोरिदम',
+        difficulty: 'advanced',
+        durationMinutes: 40,
+        content: 'ग्रोवर एल्गोरिदम N तत्वों वाले बिना क्रमबद्ध डेटाबेस में O(√N) चरणों में द्विघात गति (Quadratic Speedup) प्रदान करता है।',
+        completed: false,
+      },
+      {
+        id: 'sub-shor',
+        title: 'शोर का फैक्टराइजेशन और क्वांटम फूरियर रूपांतरण (QFT)',
+        difficulty: 'advanced',
+        durationMinutes: 45,
+        content: 'शोर का एल्गोरिदम बड़े पूर्णांकों को बहुपद समय O((log N)³) में फैक्टराइज़ करता है, जो आधुनिक क्रिप्टोग्राफी को चुनौती देता है।',
+        completed: false,
+      },
+    ],
+  },
+];

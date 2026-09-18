@@ -1,0 +1,294 @@
+import React, { useState } from 'react';
+import { 
+  Compass, RotateCcw, Play, Sparkles, Layers, Sliders, 
+  HelpCircle, ChevronRight 
+} from 'lucide-react';
+import { BlochSphere3D } from './BlochSphere3D';
+import { BlochState } from '../../types/quantum';
+import { useLanguage } from '../../context/LanguageContext';
+
+interface BlochPlaygroundProps {
+  onAskAI?: (prompt: string) => void;
+}
+
+export const BlochPlayground: React.FC<BlochPlaygroundProps> = ({ onAskAI }) => {
+  const { isHindi } = useLanguage();
+  const [theta, setTheta] = useState(1.5708); // pi / 2 (|+> state)
+  const [phi, setPhi] = useState(0);
+
+  // Derive Cartesian coordinates
+  const x = Math.sin(theta) * Math.cos(phi);
+  const y = Math.sin(theta) * Math.sin(phi);
+  const z = Math.cos(theta);
+
+  const prob0 = Math.pow(Math.cos(theta / 2), 2);
+  const prob1 = Math.pow(Math.sin(theta / 2), 2);
+
+  const blochState: BlochState & { x: number; y: number; z: number; p0: number; p1: number } = {
+    theta,
+    phi,
+    x,
+    y,
+    z,
+    purity: 1.0,
+    prob0,
+    prob1,
+    p0: prob0,
+    p1: prob1,
+  };
+
+  // Preset states
+  const setPreset = (presetKey: string) => {
+    switch (presetKey) {
+      case '0':
+        setTheta(0);
+        setPhi(0);
+        break;
+      case '1':
+        setTheta(Math.PI);
+        setPhi(0);
+        break;
+      case '+x': // |+>
+        setTheta(Math.PI / 2);
+        setPhi(0);
+        break;
+      case '-x': // |->
+        setTheta(Math.PI / 2);
+        setPhi(Math.PI);
+        break;
+      case '+y': // |+i>
+        setTheta(Math.PI / 2);
+        setPhi(Math.PI / 2);
+        break;
+      case '-y': // |-i>
+        setTheta(Math.PI / 2);
+        setPhi((3 * Math.PI) / 2);
+        break;
+    }
+  };
+
+  // Apply Gate rotations
+  const applyGate = (gate: string) => {
+    if (gate === 'X') {
+      // Rotation of pi about X-axis: theta -> pi - theta, phi -> -phi
+      setTheta((t) => Math.PI - t);
+      setPhi((p) => (2 * Math.PI - p) % (2 * Math.PI));
+    } else if (gate === 'Z') {
+      // Rotation of pi about Z-axis: phi -> phi + pi
+      setPhi((p) => (p + Math.PI) % (2 * Math.PI));
+    } else if (gate === 'H') {
+      // Hadamard flips between Z and X axes
+      if (Math.abs(theta) < 0.1) {
+        setTheta(Math.PI / 2);
+        setPhi(0);
+      } else if (Math.abs(theta - Math.PI) < 0.1) {
+        setTheta(Math.PI / 2);
+        setPhi(Math.PI);
+      } else if (Math.abs(theta - Math.PI / 2) < 0.1 && Math.abs(phi) < 0.1) {
+        setTheta(0);
+        setPhi(0);
+      } else {
+        setTheta(Math.PI / 2);
+        setPhi(0);
+      }
+    } else if (gate === 'S') {
+      // pi/2 rotation around Z-axis
+      setPhi((p) => (p + Math.PI / 2) % (2 * Math.PI));
+    } else if (gate === 'T') {
+      // pi/4 rotation around Z-axis
+      setPhi((p) => (p + Math.PI / 4) % (2 * Math.PI));
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#091124] border border-[#dfff3f]/25 rounded-2xl p-5 shadow-xl shadow-black/40">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-[#dfff3f]/10 text-[#dfff3f] border border-[#dfff3f]/20">
+            <Compass className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="text-base font-bold text-zinc-100 flex items-center gap-2">
+              {isHindi ? 'इंटरएक्टिव ब्लॉक स्फेयर' : 'Interactive Bloch Sphere'}
+              <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-[#dfff3f]/15 text-[#e9ff8a]">
+                {isHindi ? 'SU(2) क्यूबिट ज्यामिति' : 'SU(2) Qubit Geometry'}
+              </span>
+            </h3>
+            <p className="text-xs text-zinc-400">
+              {isHindi
+                ? '3D में घुमाने के लिए माउस ड्रैग करें • ध्रुवीय कोण θ और दिगंश φ बदलें • यूनिटरी रोटेशन गेट्स लागू करें'
+                : 'Drag mouse to orbit sphere in 3D • Adjust polar angle θ and azimuth φ • Apply unitary gate rotations'}
+            </p>
+          </div>
+        </div>
+
+        {onAskAI && (
+          <button
+            onClick={() => onAskAI(isHindi ? "ब्लॉक स्फेयर की ज्यामिति और सिंगल-क्यूबिट गेट्स 3D रोटेशन के रूप में कैसे काम करते हैं, समझाएं।" : "Explain the geometric meaning of the Bloch Sphere and how single-qubit gates act as 3D rotations.")}
+            className="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-medium text-xs flex items-center gap-1.5 shadow-md transition-all active:scale-95"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            {isHindi ? 'ज्यामिति समझाएं' : 'Explain Geometry'}
+          </button>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* 3D Bloch sphere */}
+        <div className="lg:col-span-7 bg-[#050914] border border-[#dfff3f]/30 rounded-2xl p-6 shadow-2xl shadow-black/60 flex flex-col items-center">
+          <div className="w-full flex items-center justify-between mb-4">
+            <span className="text-xs font-mono font-bold text-[#dfff3f] flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+              {isHindi ? '3D ब्लॉक स्फेयर' : '3D Bloch Sphere'}
+            </span>
+            <span className="text-[11px] font-mono text-zinc-400">
+              {isHindi ? 'माउस से ड्रैग करें • स्क्रॉल करके ज़ूम करें' : 'Left Click + Drag to Orbit • Scroll to Zoom'}
+            </span>
+          </div>
+
+          <BlochSphere3D
+            qubitState={blochState}
+            qubitIndex={0}
+            label={isHindi ? 'इंटरएक्टिव सिंगल क्यूबिट स्टेट |ψ⟩' : 'Interactive Single Qubit State |ψ⟩'}
+            size={360}
+            interactive={true}
+          />
+
+          {/* Quick Presets */}
+          <div className="w-full mt-6 pt-4 border-t border-white/10">
+            <span className="text-xs font-mono text-zinc-400 block mb-2 font-semibold">
+              {isHindi ? 'कैनोनिकल बेसिस स्टेट प्रीसेट:' : 'Canonical Basis State Presets:'}
+            </span>
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+              {[
+                { key: '0', label: isHindi ? '|0⟩ (उत्तर)' : '|0⟩ (North)' },
+                { key: '1', label: isHindi ? '|1⟩ (दक्षिण)' : '|1⟩ (South)' },
+                { key: '+x', label: '|+⟩ (+X)' },
+                { key: '-x', label: '|–⟩ (–X)' },
+                { key: '+y', label: '|+i⟩ (+Y)' },
+                { key: '-y', label: '|–i⟩ (–Y)' },
+              ].map((p) => (
+                <button
+                  key={p.key}
+                  onClick={() => setPreset(p.key)}
+                  className="py-1.5 px-2 rounded-lg bg-white/[.05] hover:bg-white/[.08] border border-white/10 hover:border-[#dfff3f]/40 text-[11px] font-mono text-zinc-300 hover:text-[#e9ff8a] transition-colors text-center"
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Mathematical Readout & Gate Actions */}
+        <div className="lg:col-span-5 space-y-6">
+          {/* Coordinate Sliders */}
+          <div className="bg-[#080d1e] border border-[#dfff3f]/20 rounded-2xl p-5 shadow-xl shadow-black/40 space-y-4">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#dfff3f] font-mono flex items-center gap-1.5">
+              <Sliders className="w-3.5 h-3.5" />
+              {isHindi ? 'गोलाकार ध्रुवीय कोण निर्देशांक' : 'Spherical Polar Angle Coordinates'}
+            </h4>
+
+            {/* Theta slider */}
+            <div className="space-y-1">
+              <div className="flex justify-between text-xs font-mono">
+                <span className="text-zinc-300">{isHindi ? 'ध्रुवीय कोण θ (0 से π):' : 'Polar Angle θ (0 to π):'}</span>
+                <span className="text-[#dfff3f] font-bold">
+                  {((theta * 180) / Math.PI).toFixed(1)}° ({(theta / Math.PI).toFixed(2)}π)
+                </span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max={Math.PI}
+                step="0.02"
+                value={theta}
+                onChange={(e) => setTheta(Number(e.target.value))}
+                className="w-full h-1.5 bg-white/[.08] rounded-lg appearance-none cursor-pointer accent-cyan-400"
+              />
+            </div>
+
+            {/* Phi slider */}
+            <div className="space-y-1">
+              <div className="flex justify-between text-xs font-mono">
+                <span className="text-zinc-300">{isHindi ? 'दिगंशीय फेज φ (0 से 2π):' : 'Azimuthal Phase φ (0 to 2π):'}</span>
+                <span className="text-purple-400 font-bold">
+                  {((phi * 180) / Math.PI).toFixed(1)}° ({(phi / Math.PI).toFixed(2)}π)
+                </span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max={2 * Math.PI}
+                step="0.02"
+                value={phi}
+                onChange={(e) => setPhi(Number(e.target.value))}
+                className="w-full h-1.5 bg-white/[.08] rounded-lg appearance-none cursor-pointer accent-purple-400"
+              />
+            </div>
+          </div>
+
+          {/* Unitary Gate Rotation Triggers */}
+          <div className="bg-[#080d1e] border border-[#dfff3f]/20 rounded-2xl p-5 shadow-xl shadow-black/40 space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-300 font-mono">
+              {isHindi ? 'यूनिटरी रोटेशन गेट्स लागू करें' : 'Apply Unitary Rotation Gates'}
+            </h4>
+            <p className="text-[11px] text-zinc-400">
+              {isHindi
+                ? 'ब्लॉक वेक्टर पर तत्काल भौतिक घूर्णन लागू करने के लिए गेट पर क्लिक करें:'
+                : 'Click a gate to perform an instantaneous physical rotation on the Bloch vector:'}
+            </p>
+
+            <div className="grid grid-cols-5 gap-2 pt-1">
+              {[
+                { gate: 'H', label: 'H' },
+                { gate: 'X', label: 'X (π_x)' },
+                { gate: 'Z', label: 'Z (π_z)' },
+                { gate: 'S', label: 'S (π/2_z)' },
+                { gate: 'T', label: 'T (π/4_z)' },
+              ].map((g) => (
+                <button
+                  key={g.gate}
+                  onClick={() => applyGate(g.gate)}
+                  className="py-2 rounded-lg bg-white/[.05] hover:bg-white/[.08] border border-white/10 hover:border-[#dfff3f] text-xs font-mono font-bold text-zinc-200 hover:text-[#e9ff8a] transition-colors"
+                >
+                  {g.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Vector & Density Matrix Details */}
+          <div className="bg-[#080d1e] border border-[#dfff3f]/20 rounded-2xl p-5 shadow-xl shadow-black/40 font-mono text-xs space-y-2.5">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#dfff3f] block font-mono">
+              {isHindi ? 'कार्तीय सदिश निर्देशांक (x, y, z)' : 'Cartesian Vector Coordinates (x, y, z)'}
+            </span>
+
+            <div className="grid grid-cols-3 gap-2">
+              <div className="p-2 rounded bg-black/55 border border-white/10 text-center">
+                <span className="text-zinc-400 block text-[10px]">x = sinθ cosφ</span>
+                <span className="text-[#e9ff8a] font-bold">{x.toFixed(3)}</span>
+              </div>
+              <div className="p-2 rounded bg-black/55 border border-white/10 text-center">
+                <span className="text-zinc-400 block text-[10px]">y = sinθ sinφ</span>
+                <span className="text-purple-300 font-bold">{y.toFixed(3)}</span>
+              </div>
+              <div className="p-2 rounded bg-black/55 border border-white/10 text-center">
+                <span className="text-zinc-400 block text-[10px]">z = cosθ</span>
+                <span className="text-indigo-300 font-bold">{z.toFixed(3)}</span>
+              </div>
+            </div>
+
+            <div className="p-3 rounded-lg bg-black/55 border border-white/10 flex justify-between">
+              <span className="text-zinc-400">{isHindi ? 'मापन प्रायिकताएं:' : 'Measurement Probabilities:'}</span>
+              <span className="text-zinc-200 font-semibold">
+                P(0)={(prob0 * 100).toFixed(1)}% | P(1)={(prob1 * 100).toFixed(1)}%
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
